@@ -168,8 +168,5 @@ psychobabble = [
 
     [r'No',
      ["Oh, why not?",
-      "Do you usually say no to things?"]],
-
-    [r'(.*)',
-     ["Sorry I don't get it?",
-      "Why {0}?"]]]
+      "Do you usually say no to things?"]]
+    ]

@@ -3,6 +3,7 @@ import random
 from rules.psychiatrist_rules_ELIZA import psychobabble
 from rules.small_talk_rules_ELIZA import small_talk
 
+# define reflections
 reflections = {
     "am": "are",
     "was": "were",
@@ -20,41 +21,76 @@ reflections = {
     "me": "you"
 }
 
+# define default answers for the user
+DEFAULT_ANSWERS = [
+    [r'(.*)',
+     ["Sorry I don't get it. Can your rephrase this?",
+      "You have to explain this deeper for me",
+      "Why {0}?"]]]
+
+
+def find_matching_rule(rules, sub_sentence):
+    # iterate over all rules and return the first matching rule
+    for pattern, responses in rules:
+        # search, if the statement fits a rule, ignore the case
+        match = re.search(pattern, sub_sentence, re.IGNORECASE)
+        # if matches select a random answer choice fitting the rule and return response
+        # else try the next transformation rule
+        if match:
+            # select random answer choice
+            response = random.choice(responses)
+            # reflect the question (e.g. I to you) and return response
+            return response.format(*[reflect(g) for g in match.groups()])
+
 
 # Define a function to generate a response based on the input statement
 def respond(statement):
-    for pattern, responses in RULES:
-        match = re.search(pattern, statement.rstrip(".!"), re.IGNORECASE)
-        if match:
-            response = random.choice(responses)
-            return response.format(*[reflect(g) for g in match.groups()])
+    # split user input in (sub-) sentences
+    statement_split_on_punctuation = re.findall(r"([^\.\!\?,]+[\.\!\?,]{1}|[^\.\!\?,]+$)", statement)
+    # iterate over all parts
+    for sub_sentence in statement_split_on_punctuation:
+        # try to find rule for one part and continue with the next if nothing found
+        response = find_matching_rule(RULES, sub_sentence)
+        # return response if one rule matches
+        if response is not None:
+            return response
+    # if no rule matches return default values for the first subsequence of the user input
+    return find_matching_rule(DEFAULT_ANSWERS, statement.rstrip(".!"))
 
 
 # Define a function to reflect the input statement
 def reflect(fragment):
+    # split all different words in the input part
     tokens = fragment.lower().split()
+    # iterate over all input words
     for i, token in enumerate(tokens):
+        # proof if one word out of the reflections is included in the user input
         if token in reflections:
+            # change input token if one word is included
             tokens[i] = reflections[token]
+    # join the reflected statement and return it
     return ' '.join(tokens)
 
 
-# Define a main function to run the chatbot
-def chatbot():
+# Define a main function to run the chat bot
+def chat_bot():
+    # start the conversation
     print("ELIZA: Hello. How are you feeling today?")
+    # answer conversation as long as person don't quit via quit or bye
     while True:
+        # wait for user input
         statement = input("You: ")
-        if statement == "quit":
+        # say goodbye
+        if statement.lower() == "quit" or "bye" in statement.lower():
             print("ELIZA: Goodbye. It was nice talking to you!")
             break
+        # response to the user
         print("ELIZA: " + respond(statement))
 
 
-# Call the chatbot function
+# Call the chat bot function
 if __name__ == "__main__":
+    # choose constant rules to take
     RULES = psychobabble + small_talk
-    chatbot()
-
-# ToDo: just take one part of the sentence, not the whole sentence/ multiple sentences
-# Delete questionmarks... in answers
-# lowercase von allem v.a. regex
+    # run the chat bot
+    chat_bot()
