@@ -1,5 +1,7 @@
 import re
 import random
+import sys
+sys.path.append('..')
 from rules.psychiatrist_rules_ELIZA import psychobabble
 from rules.small_talk_rules_ELIZA import small_talk
 
@@ -23,7 +25,9 @@ reflections = {
 
 # define default answers for the user
 DEFAULT_ANSWERS = [
+    # the structure for all rules stays the same: first comes the keyword, in this case as a regular expression
     [r'(.*)',
+     # afterwards the corresponding reassembly rules for the key word
      ["Sorry I don't get it. Can your rephrase this?",
       "You have to explain this deeper for me",
       "Why {0}?"]]]
@@ -86,6 +90,12 @@ def chat_bot():
             break
         # response to the user
         print("ELIZA: " + respond(statement))
+
+
+def respond_external(user_input: str, rules: list = psychobabble + small_talk):
+    global RULES
+    RULES = rules
+    return respond(user_input)
 
 
 # Call the chat bot function
