@@ -328,7 +328,7 @@
       "precedence": 0,
       "rules": [
         {
-          "decomposition": "* you [want need] *",
+          "decomposition": "* you (want|need) *",
           "reassembly": [
             "What would it mean to you if you got $4?",
             "Why do you want $4?",
@@ -339,7 +339,7 @@
           ]
         },
         {
-          "decomposition": "* you are * [happy elated glad better] *",
+          "decomposition": "* you are * (happy|elated|glad|better) *",
           "reassembly": [
             "How have I helped you to be $5?",
             "Has your treatment made you $5?",
@@ -377,7 +377,7 @@
           ]
         },
         {
-          "decomposition": "* you [can't cannot] *",
+          "decomposition": "* you (can't|cannot) *",
           "reassembly": [
             "How do you know you can't $4?",
             "Have you tried?",
@@ -496,13 +496,11 @@
     },
     {
       "keyword": ["my"],
-      "precedence": 2,
+      "precedence": 20,
       "rules": [
         {
           "decomposition": "* your * @family *",
           "reassembly": [
-            "Tell me more about your family",
-            "Who else in your family $5?",
             "Your $4",
             "What else comes to mind when you think of your $4?"
           ]
@@ -624,7 +622,7 @@
       "precedence": 2,
       "rules": [
         {
-          "decomposition": "* [everyone everybody nobody noone] *",
+          "decomposition": "* (everyone|everybody|nobody|noone) *",
           "reassembly": [
             "Really, $2?",
             "Surely not $2",
@@ -659,7 +657,7 @@
       "precedence": 10,
       "rules": [
         {
-          "decomposition": "* [am is are was] * like *",
+          "decomposition": "* (am|is|are|was) * like *",
           "reassembly": [
             "=dit"
           ]
