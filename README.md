@@ -30,5 +30,8 @@ Durch das Einlesen der externen Python Skripte mit den Transformationsregeln ist
 ## Implementierung eines UI
 Die Implementierung einer einfach Chat-Webapp findet mit dem Frameworks Streamlit statt. Dies ermöglicht mithilfe von Python Skripten grafische Benutzeroberflächen zu implementieren und über die Streamlit-Community-Cloud direkt zu deployen [^2]. Die App kann [hier](https://philipp-ding-ai-deploy-elisa-on-streamlit-ni7sei.streamlit.app/) getestet werden.
 
+## zweite Version
+Die Limietierungen der ersten Version werden durch die zweite Version behoben. Als Grundlage dient eine json Datei, die von folgendem Repo adaptiert wurde: https://github.com/iagoleal/eliza. Diese ist in ELIZA_chatbot_v2.py testbar. Die erste Version ist in der App implementiert.
+
 [^1]: https://doi.org/10.1145/365153.365168
 [^2]: https://www.bigdata-insider.de/was-ist-streamlit-a-974962/
