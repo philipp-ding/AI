@@ -496,7 +496,7 @@
     },
     {
       "keyword": ["my"],
-      "precedence": 20,
+      "precedence": 2,
       "rules": [
         {
           "decomposition": "* your * @family *",

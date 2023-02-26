@@ -34,7 +34,8 @@ list_groups = []
 #             return reassembly_rule
 #         else:
 #             return reassembly_rule
-def reassemble(before_match, after_match, string_match, reassembly_rule, original_rules, position_temp=0, list_match=[]):
+def reassemble(before_match, after_match, string_match, reassembly_rule, original_rules, position_temp=0,
+               list_match=[]):
     """
     Reassembles a string based on input parameters.
 
@@ -125,72 +126,86 @@ def apply_groups(fragment: str, groups: dict):
     # join the reflected statement and return it
     return ' '.join(tokens)
 
+
+# Define a function to reformat a rule to an answer based on input statement and original rules
 def reformat_rule_to_answer(rules: dict, statement: str, original_rules: dict):
+    # iterate over all rules in the input dict
     for rule in rules["rules"]:
         rule_regex = rule["decomposition"]
+        # Remove the "*" from the beginning of the decomposition rule
         if rule["decomposition"].startswith("*"):
             rule_regex = rule_regex[2:]
+        # Remove the "*" from the end of the decomposition rule
         if rule["decomposition"].endswith("*"):
             rule_regex = rule_regex[:-2]
+        # If there is "*" in the rule, replace it with a regular expression that matches any word
         if "*" in rule_regex:
             rule_regex = re.sub(" \* ", r".*", rule_regex)
-            _position_temp = 3
+            _position_temp = 3  # Set the value of _position_temp to 3 if there is "*"
         else:
             _position_temp = 0
+
+        # Search for a match between the rule_regex and the input statement
         match = re.search(rule_regex, statement, re.IGNORECASE)
         if match:
-            pos_match_start = match.start()
-            string_match = match.group(0)
+            pos_match_start = match.start()  # Get the start position of the match
+            string_match = match.group(0)  # Get the matched string
             if _position_temp == 3:
                 list_match = string_match.split()
-                list_match.insert(1, "*")
+                list_match.insert(1, "*")  # Insert "*" at index 1 of the list_match if there is "*"
             else:
                 list_match = []
-            pos_match_end = pos_match_start + len(string_match)
-            before_match = statement[:pos_match_start]
-            after_match = statement[pos_match_end:]
+            pos_match_end = pos_match_start + len(string_match)  # Get the end position of the match
+            before_match = statement[:pos_match_start]  # Get the string before the match
+            after_match = statement[pos_match_end:]  # Get the string after the match
 
-            reassembly_rule = random.choice(rule["reassembly"])
-            return reassemble(before_match, after_match, string_match, reassembly_rule, original_rules, _position_temp,
-                              list_match)
-
+            reassembly_rule = random.choice(rule["reassembly"])  # Choose a random reassembly rule
+            # Call the reassemble function to generate the final answer based on the reassembly rule
+            return reassemble(before_match, after_match, string_match, reassembly_rule, original_rules, _position_temp, list_match)
     return None
+
 
 def find_matching_rule(rules, sub_sentence, reflections: dict = {}, groups: dict = {}, keyword_given=None):
     list_possible_responses = []
-    # iterate over all rules and return the first matching rule
+
+    # Iterate over all rules and add any that match the sub_sentence to the list_possible_responses.
     for rule in rules:
-        # search, if the statement fits a rule, ignore the case
+        # Check each keyword in the rule and see if it matches the sub_sentence (ignoring case).
         if keyword_given is None:
             for keyword in rule["keyword"]:
+                # Build temporary keyword based on whether the keyword is at the beginning/end/middle of sub_sentence.
                 keyword_temp = keyword + " " if not sub_sentence.lower().endswith(keyword) else ""
                 keyword_temp = " " + keyword_temp if not sub_sentence.lower().startswith(keyword) else ""
+
+                # Search for the temporary keyword in the sub_sentence.
                 match = re.search(keyword_temp, sub_sentence, re.IGNORECASE)
                 if match:
+                    # If the keyword matches, add the rule to list_possible_responses.
                     list_possible_responses.append(rule)
         else:
-            match = False
+            # If a specific keyword was given, only consider rules that contain that keyword.
             for keyword in rule["keyword"]:
                 if keyword_given == keyword:
                     list_possible_responses.append(rule)
-        # if matches select a random answer choice fitting the rule and return response
-        # else try the next transformation rule
-        # if match:
-        #     list_possible_responses.append(rule)
 
+    # Sort list_possible_responses by precedence (lower numbers have higher priority).
     list_possible_responses = sorted(list_possible_responses, key=lambda x: x["precedence"])
 
     if list_possible_responses:
+        # Remove any punctuation from the sub_sentence.
         sub_sentence = re.sub("[\.\!\?,]", "", sub_sentence)
-        # reflect the response
+
+        # Reflect the sub_sentence based on any specified reflections.
         sub_sentence = reflect(sub_sentence, reflections=reflections)
+
+        # Apply any specified groups to the sub_sentence.
         sub_sentence = apply_groups(sub_sentence, groups=groups)
 
-
-        # select random answer choice
+        # Select a random response from the highest priority rule in list_possible_responses.
         response = reformat_rule_to_answer(list_possible_responses[-1], sub_sentence, rules)
-        # reflect the question (e.g. I to you) and return response
-        return response # .format(*[reflect(g, reflections=reflections) for g in response])
+
+        # Reflect the response based on any specified reflections and return it.
+        return response
 
 
 # Define a function to generate a response based on the input statement
